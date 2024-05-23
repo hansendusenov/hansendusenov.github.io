@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chat Embed</title>
+</head>
+<body>
+    <div id="iframe-container"></div>
+
+    <script>
+        async function fetchLiveChatTextarea(url) {
+            try {
+                const proxyUrl = 'https://api.allorigins.win/get?url=';
+                const response = await fetch(proxyUrl + encodeURIComponent(url));
+
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+
+                const jsonResponse = await response.json();
+                const htmlText = jsonResponse.contents;
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+
+                const textarea = doc.querySelector('textarea');
+                if (textarea) {
+                    const textareaValue = textarea.value;
+                    console.log('Textarea value:', textareaValue);
+                    return textareaValue;
+                } else {
+                    console.error('No <textarea> element found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching the URL:', error);
+            }
+        }
+
+        async function createIframeAfterResponse(url) {
+            const textareaValue = await fetchLiveChatTextarea(url);
+            if (textareaValue) {
+                createIframe(textareaValue);
+            } else {
+                console.error('Unable to create iframe. Textarea value not found.');
+            }
+        }
+
+        function createIframe(url) {
+            const iframe = document.createElement('iframe');
+            const embedUrl = new URL(url);
+            embedUrl.searchParams.set('embed_domain', 'hansendusenov.github.io'); // Set your domain here
+            console.log(embedUrl);
+            iframe.src = embedUrl.toString();
+            iframe.width = '100%';
+            iframe.height = '600px';
+            iframe.style.border = 'none';
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen = true;
+			iframe.frameborder = 0;
+			iframe.scrolling = 0;
+
+            const container = document.getElementById('iframe-container');
+            container.innerHTML = ''; // Clear any existing content
+            container.appendChild(iframe);
+        }
+
+        const url = 'https://streamdps.com/youtube_thumbs/live-chat/?id=UC8aFSTbi7yYWFhcNKuey5kg';
+        createIframeAfterResponse(url);
+    </script>
+</body>
+</html>
