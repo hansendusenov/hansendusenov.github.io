@@ -61,6 +61,8 @@
 	    iframe.frameborder = 0;
 	    iframe.scrolling = 0;
 
+ 	    // Add event listener for iframe load event
+            iframe.addEventListener('load', () => {
 	    // Inject custom CSS styles into the iframe document
             const styleElement = iframe.contentDocument.createElement('style');
             styleElement.innerHTML = `
@@ -303,6 +305,9 @@
 		}
 	    `;
 	    iframe.contentDocument.head.appendChild(styleElement);
+
+	    });
+		
             const container = document.getElementById('iframe-container');
             container.innerHTML = ''; // Clear any existing content
             container.appendChild(iframe);
